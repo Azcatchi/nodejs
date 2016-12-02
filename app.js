@@ -9,6 +9,7 @@ const bodyParser = require('body-parser')
 const sass = require('node-sass-middleware')
 const db = require('sqlite')
 const methodOverride = require('method-override')
+const cookieParser = require('cookie-parser')
 
 // Constantes et initialisations
 const PORT = process.PORT || 8080
@@ -17,6 +18,8 @@ const app = express()
 // Mise en place des vues
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
+
+app.use(cookieParser())
 
 // Préprocesseur sur les fichiers scss -> css
 app.use(sass({
@@ -39,6 +42,8 @@ app.use(bodyParser.urlencoded({ extended: false }))
 // La liste des différents routeurs (dans l'ordre)
 app.use('/', require('./routes/index'))
 app.use('/users', require('./routes/users'))
+app.use('/todo', require('./routes/todo'))
+app.use('/connexion', require('./routes/session'))
 
 // Erreur 404
 app.use(function(req, res, next) {
@@ -73,7 +78,8 @@ app.use(function(err, req, res, next) {
 
 db.open('bdd.db').then(() => {
   console.log('> BDD opened')
-  return db.run('CREATE TABLE IF NOT EXISTS users (pseudo, password, email, firstname, createdAt)')
+  db.run('CREATE TABLE IF NOT EXISTS users (pseudo, password, email, firstname, createdAt)')
+  return db.run('CREATE TABLE IF NOT EXISTS todo (userId, message, team, status, priorite, createdBy, createdAt)')
 }).then(() => {
   console.log('> Tables persisted')
 
