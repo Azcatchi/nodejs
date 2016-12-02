@@ -1,77 +1,81 @@
+// Création des constantes
 const db = require('sqlite')
 const bcrypt = require('bcryptjs');
+var mongoose = require('mongoose');
+var Schema = mongoose.Schema;
 
-module.exports = {
-  get: (userId) => {
-    return db.get('SELECT rowid, * FROM users WHERE rowid = ?', userId)
-  },
+var userModel = new Shema({
+    firstname: String,
+    email: String,
+    pseudo: String,
+    password: String,
+    createdAt: Date
+})
 
-  count: () => {
-    return db.get('SELECT COUNT(*) as count FROM users')
-  },
+// Création du User
+var User = mongoose.model('User', userModel)
 
-  getAll: (limit, offset) => {
-    return db.all('SELECT rowid, * FROM users LIMIT ? OFFSET ?', limit, offset)
-  },
 
-  insert: (params) => {
-    var hash = bcrypt.hashSync(params.password);
-    return db.run(
-      'INSERT INTO users (pseudo, password, email, firstname, createdAt) VALUES (?, ?, ?, ?, ?)',
-      params.pseudo,
-      hash,
-      params.email,
-      params.firstname,
-      Date.now()
-    )
-  },
-
-  update: (userId, params) => {
-    const POSSIBLE_KEYS = [ 'pseudo', 'password', 'email', 'firstname' ]
-
-    let dbArgs = []
-    let queryArgs = []
-
-    for (key in params) {
-      if (-1 !== POSSIBLE_KEYS.indexOf(key)) {
-        queryArgs.push(`${key} = ?`)
-        dbArgs.push(params[key])
-      }
-    }
-
-    // queryArgs.push('updatedAt = ?')
-    // dbArgs.push(Date.now())
-
-    if (!queryArgs.length) {
-      let err = new Error('Bad request')
-      err.status = 400
-      return Promise.reject(err)
-    }
-
-    dbArgs.push(userId)
-
-    let query = 'UPDATE users SET ' + queryArgs.join(', ') + ' WHERE rowid = ?'
-
-    //db.run.apply(db, query, dbArgs)
-    return db.run(query, dbArgs).then((stmt) => {
-      // Ici je vais vérifier si l'updata a bien changé une ligne en base
-      // Dans le cas contraire, cela voudra dire qu'il n'y avait pas d'utilisateur
-      // Avec db.run, la paramètre passé dans le callback du then, est le `statement`
-      // qui contiendra le nombre de lignes éditées en base
-
-      // Si le nombre de lignes dans la table mis à jour est de 0
-      if (stmt.changes === 0) {
-        let err = new Error('Not Found')
-        err.status = 404
-        return Promise.reject(err)
-      }
-
-      // Tout va bien, on retourne le stmt au prochain then, on fait comme si de rien n'était
-      return stmt
+// Création des fonctions
+User.insert = function(params) {
+  return new Promise((resolve, reject) => {
+    User = new User({
+      firstname: params.firstname,
+      email: params.email,
+      pseudo: params.pseudo,
+      password: params.password,
+      createdAt: Date.now()
     })
-  },
-
-  remove: (userId) => {
-    return db.run('DELETE FROM users WHERE rowid = ?', userId)
-  }
+    User.save(function(err){
+			if(err){
+				reject(err);
+			}
+			resolve(true);
+		})
+  })
 }
+
+User.update =  function(userId, params) {
+  return new Promise((resolve, reject) => {
+    User = new User({
+      firstname: params.firstname,
+      email: params.email,
+      pseudo: params.pseudo,
+      password: params.password,
+      createdAt: Date.now()
+    })
+    User.save(function(err){
+			if(err){
+				reject(err);
+			}
+			resolve(true);
+		})
+  })
+}
+
+User.getAll = function() => {
+  User.find({}, function(err, users) {
+    if (err) throw err;
+    return users;
+  });
+
+User.get = function(userId) {
+
+  User.findById(userId, function(err, user) {
+    if (err) throw err;
+
+    // show the one user
+    return user;
+  });
+}
+
+User.remove = function(userId) {
+
+  User.findByIdAndRemove(userId, function(err) {
+  if (err) throw err;
+
+});
+}
+
+
+module.exports = User;

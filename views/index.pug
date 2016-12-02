@@ -3,3 +3,11 @@ extends layout
 block content
   h1= title
   p Bienvenue sur #{title}
+
+  ul
+    li
+      a(href="/todo") Todo
+    li
+      a(href="/users/add") Ajouter Utilisateur
+    li
+      a(href="/todo/add") Ajouter Tache

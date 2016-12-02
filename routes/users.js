@@ -1,5 +1,5 @@
 const router = require('express').Router()
-const User = require('../models/user-redis')
+const User = require('../models/user')
 
 /* Users : liste */
 router.get('/', (req, res, next) => {
