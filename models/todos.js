@@ -53,28 +53,28 @@ module.exports = {
 	},
 
 	deleteByUserId: () => {
-		var TodosToDelete = todosModel.find(null)
-		return TodosToDelete.remove()
+		var TodosDelete = todosModel.find(null)
+		return TodosDelete.remove()
 	},
 
 // Getters
 	findByUserId: (userId) => {
-		var findTodos = todosModel.find(null)
-		findTodos.where('userId', userId)
-		return findTodos.exec()
+		var findTodosById = todosModel.find(null)
+		findTodosById.where('userId', userId)
+		return findTodosById.exec()
 	},
 
 	findByUserIdWithoutTeam: (userId) => {
-		var findTodos = todosModel.find(null)
-		findTodos.where('userId', userId)
-		findTodos.where('teamId').equals(null)
-		return findTodos.exec()
+		var findTodosByIdWithoutTeam  = todosModel.find(null)
+		findTodosByIdWithoutTeam.where('userId', userId)
+		findTodosByIdWithoutTeam.where('teamId').equals(null)
+		return findTodosByIdWithoutTeam.exec()
 	},
 
 	findByTeamId: (teamId) => {
-		var findTodos = todosModel.find(null)
-		findTodos.where('teamId', teamId)
-		return findTodos.exec()
+		var findTodosByTeamId = todosModel.find(null)
+		findTodosByTeamId.where('teamId', teamId)
+		return findTodosByTeamId.exec()
 	},
 
 // Autres fonctions

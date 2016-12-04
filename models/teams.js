@@ -42,15 +42,15 @@ module.exports = {
 	},
 
 	findById: (teamId) => {
-		var findTeam = teamModel.find(null)
-		findTeam.where('teamId', teamId)
-		return findTeam.exec()
+		var findTeamById = teamModel.find(null)
+		findTeamById.where('teamId', teamId)
+		return findTeamById.exec()
 	},
 
 	getUsersInTeam: (teamId) => {
-		var findTeam = teamModel.find(null)
-		findTeam.where('teamId', teamId)
-		findTeam.select('users')
-		return findTeam.exec()
+		var findUsersInTeam = teamModel.find(null)
+		findUsersInTeam.where('teamId', teamId)
+		findUsersInTeam.select('users')
+		return findUsersInTeam.exec()
 	}
 }

@@ -42,15 +42,15 @@ router.get('/me', (req, res) => {
 
 // Show All Users
 router.get('/', (req, res, next) => {
-	var nbrUsersTotal = 0
+	var allusers = 0
 	var limitToShow = 10
 	User.count().then((nbrUsers) => {
-		nbrUsersTotal = nbrUsers[0]['nbrUsers']
+		allusers = nbrUsers[0]['nbrUsers']
 	}).catch((err) => {
 		console.log(err)
 	})
 	User.listWithPagination(limitToShow, req.query).then((users) => {
-		nbrPages = math.ceil((nbrUsersTotal/limitToShow), -1)
+		nbrPages = math.ceil((allusers/limitToShow), -1)
 		if (!req.query.offset || req.query.offset == 0) {
 			pageActuelle = 1
 		} else {
@@ -190,12 +190,12 @@ router.get('/:userId/edit', (req, res) => {
 // Update user
 router.put('/:userId', (req, res) => {
 	User.getById(req.params.userId).then((user) => {
-		var samePwd = false
+		var comparepwd = false
 		if (req.body.pwd == '') {
 			req.body.pwd = user[0].pwd
-			samePwd = true
+			comparepwd = true
 		}
-		User.update(req.body, req.params, samePwd).then((result) => {
+		User.update(req.body, req.params, comparepwd).then((result) => {
 			res.format({
 				html: () => {
 					res.redirect('/users')
