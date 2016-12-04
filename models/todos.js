@@ -15,15 +15,15 @@ var shematodo = new mongoose.Schema({
   completed: Boolean
 })
 
+// Model
+var todosModel = mongoose.model('todos', shematodo);
+
 function dateFormated() {
 	var now = moment(new Date())
 	var date = now.format("D MMM YYYY")
 	var time = now.format("HH:mm")
 	return (date +" at "+ time)
 }
-
-// Model
-var todosModel = mongoose.model('todos', shematodo);
 
 module.exports = {
 
