@@ -1,6 +1,5 @@
 // Constantes
 const router = require('express').Router()
-const ProgressBar = require('progress')
 const bcrypt = require('bcryptjs')
 const math = require('math')
 const db = require('sqlite')
