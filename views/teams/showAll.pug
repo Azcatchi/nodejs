@@ -14,10 +14,6 @@ block content
 			tr
 				td= team.teamName
 				td= team.createdAt
-				td
-					form(method="post", action= "/teams/"+team.teamId+"?_method=DELETE")
-						.buttons
-						input(type="submit", value="Supprimer")
 				if hisTeam
 					if hisTeam == team.teamId
 						td
@@ -29,3 +25,8 @@ block content
 						form(method="post", action= "/teams/"+team.teamId+"?_method=PUT")
 							.buttons
 							input(type="submit", value="Join this team")
+				td
+					form(method="post", action= "/teams/"+team.teamId+"?_method=DELETE")
+						.buttons
+						input(type="submit", value="Supprimer")
+				
