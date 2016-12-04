@@ -45,10 +45,6 @@ app.use(methodOverride("_method", {
 	methods: [ 'POST', 'GET' ]
 }))
 
-//------------------------------------------------------//
-//-----------------------Middlewares--------------------//
-//------------------------------------------------------//
-
 // Middleware pour parler le body
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({
