@@ -1,7 +1,40 @@
-doctype html
 html
-  head
-    title= title
-    link(rel='stylesheet', href='/css/style.css')
-  body
-    block content
+	head
+		title= title
+
+	block content
+
+	br
+	br
+
+	body
+		h2 My commands - Disabled if you aren't connected
+			br
+			br
+			a(href="/") Home
+			br
+			br
+			a(href="/users/me") My profil
+			br
+			br
+			a(href="/users") All users
+			br
+			br
+			a(href="/users/add") Add user
+			br
+			br
+			a(href="/todos") All todos
+			br
+			br
+			a(href="/todos/add") Add todo
+			br
+			br
+			a(href="/teams") All teams
+			br
+			br
+			a(href="/teams/add") Add teams
+			br
+			br
+
+		form( method="post", action= "/sessions?_method=DELETE")
+			input(type="submit", value="Deconnexion")

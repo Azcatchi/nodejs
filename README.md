@@ -1,14 +1,14 @@
-#wik-njs-303-skeleton
+#Projet NodeJs Lucas Pozzer et Adrien Cluzel
 
-Simple ExpressJS skeleton.
+Bonjour voici notre node js
 
-## Install
+## Les utilisateurs déjà créés
 
-    git clone https://github.com/Tronix117/wik-njs-303-skeleton.git
-    cd wik-njs-303-skeleton
-    npm install
+    admin
+    mdp : admin
+    
+    adrien
+    mdp : adrien
 
-## Usage
-
-    npm start
-
+    lucas
+    mdp : lucas

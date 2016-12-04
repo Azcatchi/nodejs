@@ -1,0 +1,32 @@
+extends ../layout
+
+block content
+	h1 Sign in
+	- warning = warning
+	if warning
+		p Veuillez remplir tous les champs
+	- badConn = badConn
+	if badConn
+		p Mauvais User/password
+
+
+	form(method="post", action="/sessions")
+		div
+				label(for="pseudo") Your pseudo :
+				div
+					input(type="text", name="pseudo")
+		br
+		div
+				label(for="pwd") Your password :
+				div
+					input(type="password", name="pwd")
+		br
+		div
+			div
+				p
+				input(type="submit", value="Connexion")
+
+	br
+	br
+	h2
+		a(href="/users/add") Create Account

@@ -1,25 +1,31 @@
-
-
-// Dépendances native
+// Constantes
 const path = require('path')
-
-// Dépendances 3rd party
 const express = require('express')
 const bodyParser = require('body-parser')
 const sass = require('node-sass-middleware')
 const db = require('sqlite')
 const methodOverride = require('method-override')
 const cookieParser = require('cookie-parser')
-
-// Constantes et initialisations
+const mongoose = require('mongoose')
+const Redis = require('ioredis')
+const redis = new Redis()
 const PORT = process.PORT || 8080
 const app = express()
 
-// Mise en place des vues
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'pug');
+// BDD
+db.open('db.db').catch((err) => {
+	console.log(err)
+})
 
-app.use(cookieParser())
+// Ouverture bdd MonDB
+mongoose.Promise = global.Promise;
+mongoose.connect('mongodb://localhost/todos', function(err) {
+	if (err) { throw err }
+})
+
+// Mise en place des vues
+app.set('views', './views')
+app.set('view engine', 'pug')
 
 // Préprocesseur sur les fichiers scss -> css
 app.use(sass({
@@ -29,63 +35,73 @@ app.use(sass({
   outputStyle: 'expanded'
 }))
 
-// On sert les fichiers statiques
-app.use(express.static(path.join(__dirname, 'assets')))
+// Écoute en permanence sur le port défini dans les variables globales
+app.listen(PORT, () => {
+  console.log('Serveur sur port : ', PORT)
+})
 
 // Method override
-app.use(methodOverride('_method', {methods: ['GET', 'POST']}))
+app.use(methodOverride("_method", {
+	methods: [ 'POST', 'GET' ]
+}))
 
-// Middleware pour parser le body
+//------------------------------------------------------//
+//-----------------------Middlewares--------------------//
+//------------------------------------------------------//
+
+// Middleware pour parler le body
 app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.urlencoded({
+	extended: true
+}))
+
+// Permet de lier le css aux vues PUG
+app.use(express.static(path.join(__dirname, 'assets')))
+
+// Middleware pour parser les cookies
+app.use(cookieParser())
+
+// Midleware de connexion
+app.use((req, res, next) => {
+	if ((req.url == '/sessions') && (req.method == 'GET' || req.method == 'POST' || req.method == 'DELETE')) {
+		next()
+	}
+	else if (req.url == '/users') {
+		next()
+	}
+	else if (req.url == '/users/add') {
+		next()
+	}
+	else {
+		if (req.cookies.accessToken || req.headers['x-accesstoken']) {
+			var accessToken = req.cookies.accessToken
+			if (!accessToken) accessToken = req.headers['x-accesstoken']
+			redis.hgetall('token:'+accessToken).then((result) => {
+				if (result != "") {
+					if (result['expiresAt'] > Date.now()) {
+						next()
+					} else {
+						res.redirect('/sessions')
+					}
+				} else {
+					res.redirect('/sessions')
+				}
+			})
+		} else {
+			res.redirect('/sessions')
+		}
+	}
+})
 
 // La liste des différents routeurs (dans l'ordre)
-app.use('/', require('./routes/index'))
+app.use('/sessions', require('./routes/sessions'))
 app.use('/users', require('./routes/users'))
-app.use('/todo', require('./routes/todo'))
-app.use('/connexion', require('./routes/session'))
+app.use('/todos', require('./routes/todos'))
+app.use('/teams', require('./routes/teams'))
+app.use('/', require('./routes/index'))
 
-// Erreur 404
-app.use(function(req, res, next) {
-  let err = new Error('Not Found')
-  err.status = 404
-  next(err)
-})
-
-// Gestion des erreurs
-// Notez les 4 arguments !!
-app.use(function(err, req, res, next) {
-  // Les données de l'erreur
-  let data = {
-    message: err.message,
-    status: err.status || 500
-  }
-
-  // En mode développement, on peut afficher les détails de l'erreur
-  if (app.get('env') === 'development') {
-    data.error = err.stack
-  }
-
-  // On set le status de la réponse
-  res.status(data.status)
-
-  // Réponse multi-format
-  res.format({
-    html: () => { res.render('error', data) },
-    json: () => { res.send(data) }
-  })
-})
-
-db.open('bdd.db').then(() => {
-  console.log('> BDD opened')
-  db.run('CREATE TABLE IF NOT EXISTS users (pseudo, password, email, firstname, createdAt)')
-  return db.run('CREATE TABLE IF NOT EXISTS todo (userId, message, team, status, priorite, createdBy, createdAt)')
-}).then(() => {
-  console.log('> Tables persisted')
-
-  app.listen(PORT, () => {
-    console.log('> Serveur démarré sur le port : ', PORT)
-  })
-}).catch((err) => {
-  console.error('> Err: ', err)
+// Gère toutes les requêtes non gérés par les autres middlewares et renvoie un statut 501
+app.all('*', (req, res) => {
+	res.status(501)
+	res.end("URL not valid")
 })
