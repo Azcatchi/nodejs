@@ -1,0 +1,30 @@
+version: '3'
+services:
+  db-mongo:
+    image: mongo:latest
+    networks:
+      - back-tier
+    volumes:
+      - db:/data/db
+  backend:
+    build: .
+    #command: nodemon . --exitcrash
+    volumes:
+      - .:/app
+      - dependencies:/app/node_modules
+    links:
+      - db-mongo
+    environment:
+      - NODE_ENV=development
+      - MONGO_HOST=db-mongo
+    networks:
+      - front-tier
+      - back-tier
+networks:
+  front-tier:
+    driver: bridge
+  back-tier:
+    driver: bridge
+volumes:
+  dependencies:
+  db:
